@@ -87,7 +87,7 @@ func testFxattr(tfile string) error {
 	}
 
 	if len(buf) != size || string(buf) != "trusted.overlay.opaque\x00" {
-		return fmt.Errorf("flistxattr() got unexpected attr: %v %s", string(buf))
+		return fmt.Errorf("flistxattr() got unexpected attr: %s", string(buf))
 	}
 
 	err = unix.Fremovexattr(fd, "trusted.overlay.opaque")
@@ -168,7 +168,7 @@ func testLxattr(tfile string) error {
 	}
 
 	if len(buf) != size || string(buf) != "trusted.overlay.opaque\x00" {
-		return fmt.Errorf("llistxattr() got unexpected attr: %v %s", string(buf))
+		return fmt.Errorf("llistxattr() got unexpected attr: %s", string(buf))
 	}
 
 	err = unix.Lremovexattr(tlink, "trusted.overlay.opaque")

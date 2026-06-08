@@ -15,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: recursive
 
     - name: Set up Go
       uses: actions/setup-go@v4
@@ -22,7 +24,29 @@ jobs:
         go-version: '1.20'
 
     - name: Build
-      run: go build -v ./...
+      shell: bash
+      run: |
+        mapfile -t modules < <(find . -name go.mod -not -path '*/vendor/*' -printf '%h\n' | sort)
+        test "${#modules[@]}" -gt 0
+        for module in "${modules[@]}"; do
+          echo "::group::go build ${module}"
+          (
+            cd "${module}"
+            go build -buildvcs=false -v ./...
+          )
+          echo "::endgroup::"
+        done
 
     - name: Test
-      run: go test -v ./...
+      shell: bash
+      run: |
+        mapfile -t modules < <(find . -name go.mod -not -path '*/vendor/*' -printf '%h\n' | sort)
+        test "${#modules[@]}" -gt 0
+        for module in "${modules[@]}"; do
+          echo "::group::go test ${module}"
+          (
+            cd "${module}"
+            go test -buildvcs=false -v ./...
+          )
+          echo "::endgroup::"
+        done
